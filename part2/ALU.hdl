@@ -43,30 +43,30 @@ CHIP ALU {
 
     PARTS:
         // ZX & NX selection
-        Mux16(a=x, sel=zx, out=zx_out);
-        Not16(in=zx_out, out=ox);
-        Mux16(a=zx_out, b=ox, sel=nx, out=new_x);
+        Mux16(a=x, sel=zx, out=zxout);
+        Not16(in=zxout, out=ox);
+        Mux16(a=zxout, b=ox, sel=nx, out=newx);
 
         // ZY & NY selection
-        Mux16(a=y, sel=zy, out=zy_out);
-        Not16(in=zy_out, out=oy);
-        Mux16(a=zy_out, b=oy, sel=ny, out=new_y);
+        Mux16(a=y, sel=zy, out=zyout);
+        Not16(in=zyout, out=oy);
+        Mux16(a=zyout, b=oy, sel=ny, out=newy);
 
         // Function Compute
-        Add16(a=new_x, b=new_y, out=xyadd);
-        And16(a=new_x, b=new_y, out=xyand);
-        Mux16(a=xyadd, b=xyand, sel=f, out=res);
+        Add16(a=newx, b=newy, out=xyadd);
+        And16(a=newx, b=newy, out=xyand);
+        Mux16(a=xyand, b=xyadd, sel=f, out=res);
 
         // NO selection
         Not16(in=res, out=nres);
-        Mux16(a=res, b=nres, sel=no, out=out);
+        Mux16(a=res, b=nres, sel=no, out=out, out[15]=fout, out[0..7]=fl, out[8..15]=fr);
 
         // ZR Compute
-        Or8Way(in=out[0..7], out=l_out);
-        Or8Way(in=out[8..15], out=r_out);
-        Or(a=l_out, b=r_out, out=final);
+        Or8Way(in=fl, out=lout);
+        Or8Way(in=fr, out=rout);
+        Or(a=lout, b=rout, out=final);
         Not(in=final, out=zr);
 
         // NG Compute
-        And(a=out[15], b=true, out=ng);
+        And(a=fout, b=true, out=ng);
 }
